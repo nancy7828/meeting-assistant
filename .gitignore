@@ -1,11 +1,1 @@
-﻿# Ignore everything by default (desktop repo safety)
-*
-
-# Keep repository essentials
-!.gitignore
-!README.md
-!meeting_assistant_final.html
-
-# Optional docs folder for screenshots
-!docs/
 !docs/**
