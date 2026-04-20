@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A3A5C;--navy-d:#0F2340;--navy-l:#2A5080;
+  --gold:#C9A84C;--gold-l:#E8C97A;
+  --bg:#F5F7FA;--surf:#FFFFFF;--surf2:#EEF2F7;
+  --bdr:#D0DAE8;--bdr-l:#E8EFF7;
+  --tx:#1A2740;--tx2:#4A5A72;--tx3:#8898AA;
+  --ok:#27855A;--ok-bg:#EAF5EF;
+  --warn:#B87A10;--warn-bg:#FDF6E3;
+  --err:#C0392B;--err-bg:#FDECEA;
+  --gray:#6B7280;--gray-bg:#F3F4F6;
+  --r:8px;--rl:12px;
+  font-family:'PingFang SC','Microsoft YaHei',sans-serif;
+}
+body{background:var(--bg);color:var(--tx);font-size:14px;line-height:1.6}
+.app{max-width:900px;margin:0 auto;padding:14px}
+.hdr{background:var(--navy);border-radius:var(--rl);padding:15px 20px;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between}
+.hdr-l{display:flex;align-items:center;gap:10px}
+.hdr-ico{width:32px;height:32px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.hdr-title{color:#fff;font-size:16px;font-weight:700}
+.hdr-sub{color:rgba(255,255,255,.55);font-size:11px;margin-top:1px}
+.demo-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 11px;border-radius:5px;cursor:pointer;font-size:12px;font-family:inherit}
+.demo-btn:hover{background:rgba(255,255,255,.25)}
+.flow-bar{display:flex;align-items:center;background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:9px 16px;margin-bottom:13px;gap:6px}
+.fstp{display:flex;align-items:center;gap:7px;cursor:pointer;padding:6px 10px;border-radius:6px;flex:1;justify-content:center;color:var(--tx2);transition:.2s}
+.fstp:hover{background:var(--surf2)}
+.fstp.active{background:var(--navy);color:#fff}
+.fstp.done{color:var(--ok)}
+.snum{width:22px;height:22px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.fstp.active .snum{background:#fff;color:var(--navy);border-color:#fff}
+.farr{color:var(--bdr);font-size:15px;flex-shrink:0}
+.slbl{font-size:13px;font-weight:500}.ssub{font-size:10px;opacity:.7}
+.tc{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:17px}
+.stitle{font-size:12px;font-weight:700;color:var(--navy);letter-spacing:.6px;text-transform:uppercase;margin-bottom:9px;padding-bottom:6px;border-bottom:2px solid var(--bdr-l)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.fg.tri{grid-template-columns:1fr 1fr 1fr}.fg.full{grid-template-columns:1fr}
+.fgrp{display:flex;flex-direction:column;gap:3px}.fgrp.s2{grid-column:span 2}
+label{font-size:11px;font-weight:500;color:var(--tx2)}
+.req{color:var(--err);margin-left:2px}.opt{color:var(--tx3);font-weight:400}
+input,select,textarea{width:100%;padding:7px 10px;border:1px solid var(--bdr);border-radius:5px;font-family:inherit;font-size:13px;color:var(--tx);background:var(--surf);outline:none;transition:.2s}
+input:focus,select:focus,textarea:focus{border-color:var(--navy)}
+textarea{resize:vertical;line-height:1.6}
+.rg8{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:13px}
+.ro8{display:flex;align-items:center;gap:4px;cursor:pointer;padding:5px 7px;border:1px solid var(--bdr);border-radius:5px;font-size:11px;transition:.2s}
+.ro8:hover{border-color:var(--navy);background:var(--surf2)}
+.ro8.sel{border-color:var(--navy);background:var(--navy);color:#fff}
+.ro8 .dot{width:7px;height:7px;border-radius:50%;border:1.5px solid currentColor;flex-shrink:0}
+.ro8.sel .dot{background:#fff;border-color:#fff}
+.arow{display:flex;align-items:center;gap:7px;margin-top:13px;padding-top:13px;border-top:1px solid var(--bdr-l);flex-wrap:wrap}
+.btn-p{background:var(--navy);color:#fff;border:none;padding:9px 16px;border-radius:5px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s;white-space:nowrap}
+.btn-p:hover{background:var(--navy-l)}.btn-p:disabled{opacity:.45;cursor:not-allowed}
+.btn-s{background:transparent;color:var(--tx2);border:1px solid var(--bdr);padding:7px 13px;border-radius:5px;font-family:inherit;font-size:12px;cursor:pointer}
+.btn-s:hover{border-color:var(--navy);color:var(--navy)}
+.btn-i{background:transparent;border:1px solid var(--bdr);padding:5px 9px;border-radius:5px;cursor:pointer;font-size:11px;color:var(--tx2);font-family:inherit;display:flex;align-items:center;gap:3px;transition:.2s;white-space:nowrap}
+.btn-i:hover{border-color:var(--navy);color:var(--navy)}
+.btn-w{background:#1A56A0;color:#fff;border:none;padding:5px 9px;border-radius:5px;cursor:pointer;font-size:11px;font-family:inherit;display:flex;align-items:center;gap:3px;white-space:nowrap}
+.btn-w:hover{background:#124080}
+.btn-e{background:#217346;color:#fff;border:none;padding:5px 9px;border-radius:5px;cursor:pointer;font-size:11px;font-family:inherit;display:flex;align-items:center;gap:3px;white-space:nowrap}
+.btn-e:hover{background:#185534}
+.out-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.out-lbl{font-size:11px;font-weight:700;color:var(--navy);letter-spacing:.5px;text-transform:uppercase}
+.out-acts{display:flex;gap:5px}
+.np{background:#fff;border:1px solid var(--bdr);border-radius:7px;overflow:hidden}
+.np-head{background:#CC0000;color:#fff;text-align:center;padding:12px 18px}
+.np-org{font-size:20px;font-weight:900;letter-spacing:2px}
+.np-line{height:3px;background:#fff;margin:5px 18px 0}
+.np-title{text-align:center;font-size:15px;font-weight:700;padding:12px 0 7px;border-bottom:1px solid var(--bdr-l)}
+.np-body{padding:12px 18px;font-size:13px;line-height:2}
+.np-field{display:flex;gap:6px;margin-bottom:1px}
+.np-fk{font-weight:500;min-width:56px}
+.np-topic{margin-bottom:6px}
+.np-topic-main{font-weight:500}
+.np-topic-subs{padding-left:14px;color:var(--tx2);font-size:12px;line-height:1.9}
+.np-footer{padding:8px 18px 12px;text-align:right;font-size:13px;border-top:1px solid var(--bdr-l)}
+.np-contact{text-align:center;font-size:12px;color:var(--tx3);padding:5px 0}
+.loading-overlay{display:flex;align-items:center;justify-content:center;padding:28px;flex-direction:column;gap:12px}
+.spinner{width:30px;height:30px;border:3px solid var(--bdr);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--tx2);font-weight:500}
+.loading-steps{display:flex;flex-direction:column;gap:3px;width:100%;max-width:260px}
+.lstep{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:4px;font-size:11px;color:var(--tx3);transition:.3s}
+.lstep.a{background:var(--surf2);color:var(--navy);font-weight:500}.lstep.d{color:var(--ok)}
+.lstep-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.trace-layout{display:grid;grid-template-columns:57% 43%;gap:10px;margin-top:13px}
+.tlbl{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.trace-hint{font-size:10px;background:var(--warn-bg);border:1px solid #F0D080;border-radius:3px;padding:1px 6px;color:var(--warn);font-weight:400}
+.min-sec-head{font-size:12px;font-weight:700;color:var(--navy);background:var(--surf2);padding:5px 9px;border-radius:5px;margin-bottom:5px;margin-top:10px}
+.tp{background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:9px 11px;font-size:12px;line-height:1.8;cursor:pointer;transition:.2s;border-left:3px solid transparent;margin-bottom:4px;position:relative}
+.tp:hover{border-left-color:var(--navy-l);background:#EEF4FB}
+.tp.traced{border-left-color:var(--gold);background:#FEF9EC}
+.tp:hover::after{content:'点击溯源';position:absolute;right:6px;top:5px;font-size:10px;color:var(--tx3);background:var(--surf);border:1px solid var(--bdr);padding:1px 5px;border-radius:3px;pointer-events:none}
+.dec-item{display:flex;gap:7px;padding:7px 9px;border:1px solid var(--bdr);border-radius:5px;cursor:pointer;transition:.2s;margin-bottom:4px;align-items:flex-start}
+.dec-item:hover{border-color:var(--navy-l);background:#EEF4FB}
+.dec-item.traced{border-color:var(--gold);background:#FEF9EC}
+.dec-num{min-width:19px;height:19px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px}
+.dec-content{flex:1;font-size:12px;line-height:1.7}
+.dec-meta{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap}
+.dec-tag{font-size:10px;padding:1px 5px;border-radius:3px}
+.dt-p{background:#E8EFF7;color:var(--navy-l)}.dt-dl{background:var(--warn-bg);color:var(--warn)}
+.dt-u{background:var(--err-bg);color:var(--err)}.dt-i{background:var(--warn-bg);color:var(--warn)}.dt-n{background:var(--ok-bg);color:var(--ok)}
+.defer-zone{margin-top:10px;background:var(--gray-bg);border:1px solid #D1D5DB;border-radius:6px;padding:10px}
+.defer-head{font-size:11px;font-weight:700;color:var(--gray);margin-bottom:7px;display:flex;align-items:center;gap:4px}
+.defer-item{background:#fff;border:1px solid #D1D5DB;border-radius:5px;padding:7px 9px;font-size:12px;color:var(--gray);margin-bottom:4px;display:flex;gap:7px;cursor:pointer;transition:.2s}
+.defer-item:hover{background:#F9FAFB}
+.defer-ico{font-size:13px;flex-shrink:0}.defer-reason{font-size:11px;color:#9CA3AF;margin-top:1px}
+.src-box{background:#FAFBFC;border:1px solid var(--bdr);border-radius:6px;padding:11px;font-size:12px;line-height:1.9;min-height:280px;max-height:480px;overflow-y:auto}
+.src-idle{display:flex;align-items:center;justify-content:center;height:100px;color:var(--tx3);font-size:12px;text-align:center}
+.src-span{transition:background .25s;border-radius:2px;padding:2px 0;display:block;margin-bottom:4px}
+.src-span.hl{background:#FFF176;padding:2px 4px;border-radius:4px;border-left:3px solid var(--gold)}
+.src-sep{display:block;margin:5px 0;border-bottom:1px dashed var(--bdr-l)}
+.src-person{font-weight:700;color:var(--navy-d);font-size:11px}
+.person-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden;margin-bottom:9px}
+.pc-head{background:var(--navy);color:#fff;padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
+.pc-name{font-weight:500;font-size:12px;display:flex;align-items:center;gap:6px}
+.pc-av{width:22px;height:22px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--navy-d)}
+.pc-cnt{font-size:10px;background:rgba(255,255,255,.2);padding:2px 6px;border-radius:8px}
+.task-list{padding:8px 12px;display:flex;flex-direction:column;gap:6px}
+.task-item{display:flex;gap:8px;padding:6px;background:var(--surf2);border-radius:5px}
+.task-dot{width:7px;height:7px;border-radius:50%;background:var(--navy);margin-top:4px;flex-shrink:0}
+.task-text{font-size:12px;color:var(--tx);line-height:1.5}
+.task-meta{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap}
+.task-dl{font-size:10px;color:var(--tx3)}.task-dlv{font-size:10px;color:var(--navy-l);border:1px solid var(--bdr-l);padding:1px 5px;border-radius:3px}
+.notice-block{padding:9px 11px;background:#fff;border-left:3px solid var(--navy);border-radius:0 5px 5px 0;margin-bottom:7px}
+.nb-to{font-size:10px;font-weight:700;color:var(--navy);letter-spacing:.4px;margin-bottom:3px;text-transform:uppercase}
+.nb-text{font-size:12px;color:var(--tx);line-height:1.8}
+.next-hint{margin-top:11px;padding:8px 12px;background:linear-gradient(135deg,#EEF4FB,#F5EFE0);border:1px solid var(--gold-l);border-radius:6px;font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:6px}
+.tip-box{background:var(--warn-bg);border:1px solid #F0D080;border-radius:5px;padding:7px 11px;font-size:12px;color:var(--tx2);margin-bottom:11px;display:flex;gap:6px}
+.ag-row{display:flex;gap:7px;align-items:flex-start;margin-bottom:9px;padding:9px;background:var(--surf2);border-radius:6px}
+.ag-num{min-width:22px;height:22px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.ag-fields{flex:1;display:flex;flex-direction:column;gap:5px}
+.ag-del{background:none;border:1px solid var(--bdr);border-radius:4px;color:var(--tx3);cursor:pointer;padding:2px 6px;font-size:11px;flex-shrink:0;margin-top:2px}
+.ag-del:hover{border-color:var(--err);color:var(--err)}
+.toast{position:fixed;bottom:14px;right:14px;background:var(--navy);color:#fff;padding:6px 13px;border-radius:5px;font-size:12px;opacity:0;transition:.3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="toast" id="toast"></div>
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="hdr-ico">&#127981;</div>
+    <div>
+      <div class="hdr-title">政企智能会议全流程助手</div>
+      <div class="hdr-sub">会前通知 · 会中纪要 · 会后任务</div>
+    </div>
+  </div>
+  <button class="demo-btn" onclick="loadDemo()">&#128196; 加载演示数据</button>
+</div>
+
+<div class="flow-bar">
+  <div class="fstp" id="fb0" onclick="sw(0)"><div class="snum">1</div><div><div class="slbl">会前通知</div><div class="ssub">通知生成</div></div></div>
+  <div class="farr">›</div>
+  <div class="fstp" id="fb1" onclick="sw(1)"><div class="snum">2</div><div><div class="slbl">会中纪要</div><div class="ssub">溯源可查</div></div></div>
+  <div class="farr">›</div>
+  <div class="fstp" id="fb2" onclick="sw(2)"><div class="snum">3</div><div><div class="slbl">会后任务</div><div class="ssub">执行追踪</div></div></div>
+</div>
+
+<!-- TAB 0 -->
+<div class="tc" id="t0">
+  <div class="stitle">会议通知生成</div>
+  <div class="fg">
+    <div class="fgrp s2"><label>会议主题 <span class="req">*</span></label><input id="n-title" placeholder="滨江智算产业园重大项目推进专题会议"></div>
+    <div class="fgrp"><label>发文单位 <span class="req">*</span></label><input id="n-org" placeholder="滨江区区委办公室"></div>
+    <div class="fgrp"><label>发文日期 <span class="req">*</span></label><input id="n-date" placeholder="2026年3月18日"></div>
+    <div class="fgrp"><label>会议时间 <span class="req">*</span></label><input id="n-time" placeholder="2026年3月21日（周一）下午14:30"></div>
+    <div class="fgrp"><label>会议地点</label><input id="n-loc" placeholder="区政府1号会议室"></div>
+    <div class="fgrp"><label>腾讯/线上会议号 <span class="opt">可选</span></label><input id="n-tmt" placeholder="腾讯会议号 839 381 630"></div>
+    <div class="fgrp"><label>主持人 <span class="req">*</span></label><input id="n-host" placeholder="王思　区委办主任"></div>
+    <div class="fgrp"><label>联系人及电话 <span class="opt">可选</span></label><input id="n-contact" placeholder="赵文 13901005678"></div>
+  </div>
+  <div class="stitle" style="margin-top:2px">会议议题</div>
+  <div id="ag-list"></div>
+  <button class="btn-s" onclick="addAg()" style="font-size:12px;margin-bottom:13px">+ 添加议题</button>
+  <div class="fg full">
+    <div class="fgrp"><label>参会单位/人员</label><textarea id="n-units" rows="2" placeholder="城投集团、区财政局、区规自局等单位主管领导及科室负责同志"></textarea></div>
+    <div class="fgrp"><label>会议要求 <span class="opt">可选</span></label><textarea id="n-req" rows="2" placeholder="请各单位于会议前一天12点前电话反馈参会人员名单"></textarea></div>
+  </div>
+  <div class="arow">
+    <button class="btn-p" onclick="genNotice()">&#128196; 生成会议通知</button>
+    <button class="btn-s" onclick="document.getElementById('n-out').style.display='none'">清空</button>
+  </div>
+  <div id="n-out" style="display:none;margin-top:14px">
+    <div class="out-hdr">
+      <div class="out-lbl">&#128196; 会议通知预览</div>
+      <div class="out-acts">
+        <button class="btn-w" onclick="expWord('n-preview','会议通知')">&#128196; 导出Word</button>
+        <button class="btn-i" onclick="cpEl('n-preview')">&#128203; 复制</button>
+      </div>
+    </div>
+    <div class="np" id="n-preview"></div>
+    <div class="next-hint">&#128336; 通知发出后，前往「会中纪要」整理会议记录</div>
+  </div>
+</div>
+
+<!-- TAB 1 -->
+<div class="tc" id="t1" style="display:none">
+  <div class="tip-box">&#128161; 粘贴会议记录原文，点击左侧任意段落，右侧原始发言自动高亮溯源。</div>
+  <div class="stitle">会议基本信息</div>
+  <div class="fg tri">
+    <div class="fgrp"><label>会议时间</label><input id="m-time" placeholder="2026年3月21日 14:30—16:30"></div>
+    <div class="fgrp"><label>会议地点</label><input id="m-loc" placeholder="区政府1号会议室"></div>
+    <div class="fgrp"><label>主持人</label><input id="m-host" placeholder="王思（区委办主任）"></div>
+    <div class="fgrp"><label>记录人</label><input id="m-rec" placeholder="赵文"></div>
+    <div class="fgrp s2"><label>参会人员</label><input id="m-att" placeholder="陈凯（区长）、郑瑞林（城投总经理）、吴林（沿江街道书记）等11人"></div>
+  </div>
+  <div class="stitle" style="margin-top:2px">会议类型（8种）</div>
+  <div class="rg8" id="mtypes">
+    <div class="ro8" onclick="selT(this)"><div class="dot"></div>常务/全体会议</div>
+    <div class="ro8 sel" onclick="selT(this)"><div class="dot"></div>专题会议</div>
+    <div class="ro8" onclick="selT(this)"><div class="dot"></div>政策解读会</div>
+    <div class="ro8" onclick="selT(this)"><div class="dot"></div>评审/论证会</div>
+    <div class="ro8" onclick="selT(this)"><div class="dot"></div>协调/推进会</div>
+    <div class="ro8" onclick="selT(this)"><div class="dot"></div>座谈会</div>
+    <div class="ro8" onclick="selT(this)"><div class="dot"></div>现场办公会</div>
+    <div class="ro8" onclick="selT(this)"><div class="dot"></div>电视电话会议</div>
+  </div>
+  <div class="stitle" style="margin-top:2px">会议记录原文</div>
+  <textarea id="m-raw" rows="6" placeholder="粘贴会议记录（支持录音转写文本、口语格式）…" style="margin-bottom:13px"></textarea>
+  <div class="arow">
+    <button class="btn-p" onclick="genMin()" id="btn-m">&#128221; 生成纪要 + 提取决议</button>
+    <button class="btn-s" onclick="hideMin()">清空</button>
+  </div>
+  <div id="m-out" style="display:none">
+    <div id="m-loading" class="loading-overlay" style="display:none">
+      <div class="spinner"></div>
+      <div class="loading-text" id="m-ltxt">准备中…</div>
+      <div class="loading-steps" id="m-lsteps"></div>
+    </div>
+    <div id="m-result" style="display:none">
+      <div class="out-hdr" style="margin-top:13px">
+        <div class="out-lbl">&#128221; 纪要 · 溯源高亮</div>
+        <div class="out-acts">
+          <button class="btn-w" onclick="expMinWord()">&#128196; 纪要Word</button>
+          <button class="btn-e" onclick="expDecExcel()">&#128200; 决议Excel</button>
+        </div>
+      </div>
+      <div class="trace-layout">
+        <div>
+          <div class="tlbl">纪要正文 / 议定事项 <span class="trace-hint">点击任意段落查看溯源</span></div>
+          <div id="m-left"></div>
+        </div>
+        <div>
+          <div class="tlbl">&#128270; 原始发言溯源</div>
+          <div class="src-box" id="src-box">
+            <div class="src-idle" id="src-idle">← 点击左侧段落<br>此处高亮原始发言</div>
+            <div id="src-content" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+      <div class="next-hint">&#9989; 决议已提取，前往「会后任务」生成任务清单</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2 -->
+<div class="tc" id="t2" style="display:none">
+  <div class="tip-box" id="t2-tip">&#128276; 请先完成「会中纪要」步骤，任务数据将自动流转至此。</div>
+  <div id="t2-main" style="display:none">
+    <div class="stitle" style="margin-bottom:11px">任务清单（按责任人）</div>
+    <div id="t-cards"></div>
+    <div class="arow">
+      <button class="btn-p" onclick="genAlerts()">&#128279; 生成催办通知</button>
+      <button class="btn-e" onclick="expTaskExcel()">&#128200; 导出任务Excel</button>
+    </div>
+    <div id="ca-out" style="display:none;margin-top:13px">
+      <div class="out-hdr"><div class="out-lbl">&#128279; 催办通知</div><div class="out-acts"><button class="btn-i" onclick="cpEl('ca-notices')">&#128203; 复制全部</button></div></div>
+      <div id="ca-notices"></div>
+      <div style="margin-top:9px;padding:8px 12px;background:#EEF4FB;border:1px solid #C0D8F0;border-radius:6px;font-size:12px;color:var(--tx2)"><strong>&#128270; 下次会议建议议题：</strong>土地清表进度汇报 · 变电站协调结果通报 · 资金方案审定</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+var agIdx=0;
+
+var DEMO={
+  nTitle:'滨江智算产业园及配套重大项目推进会',
+  nOrg:'滨江区区委办公室',
+  nDate:'2026年3月18日',
+  nTime:'2026年3月21日（周一）下午14:30',
+  nLoc:'区政府1号会议室',
+  nTmt:'',
+  nHost:'王思　区委办主任',
+  nContact:'赵文 联系电话：13901005678',
+  nUnits:'城投集团、沿江街道、区财政局、区规自局、区发改委、区供电公司、区生态环境局、区住建委、区数据局、区发改委主管领导及相关科室负责同志参会',
+  nReq:'请各相关单位于3月20日（星期日）12点前电话反馈参会人员名单。',
+  nAg:[
+    {m:'一、研究滨江智算产业园一期、二期建设推进及存在问题',s:[
+      '1. 城投集团汇报产业园一期工程进展、二期地块清表倒排计划及资金缺口问题（各）；',
+      '2. 沿江街道汇报二期地块钉子户攻坚方案及预计交付时间节点；',
+      '3. 区财政局汇报二期建设资金调度方案及专项债申报进展；',
+      '4. 区规自局汇报二期土地指标置换进展及人才公寓用地调规存在问题。'
+    ]},
+    {m:'二、研究智算中心配套保障及产业导入存在问题',s:[
+      '1. 区供电公司汇报220千伏变电站建设进度及管网跨越水务局协调问题；',
+      '2. 区生态环境局汇报算力中心能耗指标及环评审批要求（区发改委补充汇报市能耗指标争取情况）；',
+      '3. 区住建委汇报一期机房液冷加固方案审查及绿色通道审批安排；',
+      '4. 区数据局汇报头部企业入驻意向协议签订条件及绿电购买方案。'
+    ]}
+  ],
+  mTime:'2026年3月21日 14:30—16:30（约2小时）',
+  mLoc:'区政府1号会议室',
+  mHost:'王思（区委办主任）',
+  mRec:'赵文',
+  mAtt:'陈凯（区委副书记、区长）、郑瑞林（城投集团总经理）、吴林（沿江街道书记）、赵思睿（区规自局局长）、钱学培（区财政局局长）、周学琦（区生态环境局局长）、孙淼（区住建委主任）、冯斌（区数据局局长）、李永亮（区发改委主任）、刘莘（区供电公司总经理）等共11人',
+  mRaw:`[00:00:15] 王思（区委办主任）：今天这个会核心是滨江智算产业园及配套项目，直接说问题，卡在哪儿、谁来解决。
+
+[00:04:30] 郑瑞林（城投集团总经理）：一期土建约70%，二期未动工，清表未完成。220千伏变电站接入方案未定，资金仅够半个月，二期缺口近2亿元。
+
+[00:13:20] 吴林（沿江街道党工委书记）：剩余几户为历史遗留，诉求明显超政策边界，协商难度大。
+
+[00:19:50] 陈凯（区委副书记、区长）：清表不能再拖，依法程序要同步推进，必须给出硬节点。
+
+[00:31:10] 赵思睿（区规自局局长）：人才公寓调规需市规自局审批，补充交评与教育配套材料；二期土地指标仍有缺口。
+
+[00:46:05] 钱学培（区财政局局长）：财政收支压力大，直接拨付2亿元困难，建议专项债或融资并配套贴息。
+
+[00:52:40] 郑瑞林（城投集团总经理）：城投负债率高，融资受限，若无兜底支持存在停工风险。
+
+[00:57:15] 陈凯（区委副书记、区长）：下周二前财政和城投同步拿出资金调度与融资方案，确保二期不停工。
+
+[01:05:45] 冯斌（区数据局局长）：头部企业有意向，但要求双路市电与独立能耗指标。
+
+[01:13:05] 周学琦（区生态环境局局长）：能耗和碳排放压力大，原则上需绿电比例不低于30%。
+
+[01:19:40] 孙淼（区住建委主任）：一期若上液冷需加固，涉及变更、审图、增资与工期。
+
+[01:41:15] 刘莘（区供电公司总经理）：变电站卡在管网跨越协调，需区里对接市水务局。
+
+[01:52:40] 李永亮（区发改委主任）：建议同步推进争资争项、社会资本与能耗指标协调。
+
+[01:58:15] 陈凯（区委副书记、区长）：形成五项决议：清表、调规与指标、资金保障、变电站协调、联合会审与产业导入，全部按节点督办。`
+};
+
+var SRCS=[
+  {id:'s0',spk:'王思（区委办主任）',txt:'今天这个会，核心就是咱们区里的"一号工程"——滨江智算产业园，还有配套的算力中心变电站和人才公寓项目。区里主要领导是非常不满意进度的，今天陈区长专门腾出时间来听。我们今天直接说问题，卡在哪儿？谁卡的？怎么解决？'},
+  {id:'s1',spk:'郑瑞林（城投集团总经理）',txt:'目前滨江智算产业园一期土建大概完成了70%，二期还没动工，主要是地块清表没做完。配套的220千伏变电站，选址已定，但供电公司还没出接入方案。资金方面，账上资金大概只够撑半个月，二期土建款项还有将近两个亿的缺口，如果资金不到位，工人可能要停工讨薪。'},
+  {id:'s2',spk:'吴林（沿江街道书记）',txt:'剩下的那几户，都是历史遗留问题。有一户非要求两套现房加三百万补偿，政策上不允许。我们街道干部天天去做工作，人家不见面，或者漫天要价，甚至拿泼粪威胁。我们大概下周再组织一次多方协商。'},
+  {id:'s3',spk:'陈凯（区委副书记、区长）',txt:'吴书记，你总是下周下周，这都拖了多久了！违章建筑认定书下达没有？强拆的法律程序走到哪一步了？该走法律程序的要走，该强拆的必须依法强拆！你大概给个准信，到底什么时候能清出来交付城投？'},
+  {id:'s4',spk:'吴林（沿江街道书记）',txt:'如果法院那边裁定顺利的话，下个月十五号之前应该能搞定。我们一定加班加点抓紧。'},
+  {id:'s5',spk:'赵思睿（区规自局局长）',txt:'人才公寓那块地，原来规划是商业用地，调改成R2居住用地需要市规自局审批。市局要求补充交通影响评价报告和教育配套承诺函。产业园二期指标不够，在跟市里沟通能否指标置换，大概还需要两周时间有明确消息。'},
+  {id:'s6',spk:'陈凯（区委副书记、区长）',txt:'你要去市局跑！你盯着办，你们规自局这周必须派专人驻点市局，批不下来别回来。人才公寓的交通评价报告这周必须出！'},
+  {id:'s7',spk:'钱学培（区财政局局长）',txt:'咱们今年土地出让金收入大幅下降，保基本民生、保工资、保运转都有压力。两个亿的现金，区级国库确实拿不出来。建议考虑发专项债，或者让城投做项目融资，财政可以提供贴息支持。'},
+  {id:'s8',spk:'郑瑞林（城投集团总经理）',txt:'城投负债率已超过80%，银行融资卡得很死。专项债周期太长，远水解不了近渴。如果财政不兜底一部分，二期可能真要停工了。'},
+  {id:'s9',spk:'陈凯（区委副书记、区长）',txt:'停什么工！钱局长，你回去把科教文卫结余资金和产业引导基金盘一盘，能抽调多少。下周二之前给我一个资金调度方案。城投这边，产业园未来收益权可以做抵押去跟银行谈！二期资金下月底之前到位，绝不允许停工！'},
+  {id:'s10',spk:'冯斌（区数据局局长）',txt:'我们对接了百度、华为、商汤等头部企业，有初步意向。但人家要求必须保证双路市电，而且能耗指标必须单独批，不能占他们自己配额。电和能耗是核心卡点。'},
+  {id:'s11',spk:'周学琦（区生态环境局局长）',txt:'智算中心耗电量太大，区里碳排放考核指标本来就很紧张。如果绿电购买比例能达到30%以上，我们环评这边可以研究开个口子，否则市环保局那关过不去。'},
+  {id:'s12',spk:'孙淼（区住建委主任）',txt:'液冷技术对建筑荷载要求很高。城投一期底板是按常规厂房做的，如果改液冷，承重可能根本达不到，必须加固，走设计变更、重新审图，大概耽搁一两个月，增加约两千万预算。'},
+  {id:'s13',spk:'陈凯（区委副书记、区长）',txt:'我们要建就建一流的！一期也必须按高标准建，底板不行就加固！两千万就两千万！总比建个废品强！孙主任，如果区里开绿色通道，加固设计最快多久能出？'},
+  {id:'s14',spk:'刘莘（区供电公司总经理）',txt:'220千伏变电站省公司已立项，但卡在选址路径，下面有一根主管网，市水务局不同意跨越施工。如果不解决，变电站根本开不了工，没有变电站，夏天高峰期都要拉闸限电。区里出面协调的话，大概半年能建起来。'},
+  {id:'s15',spk:'陈凯（区委副书记、区长）',txt:'就因为一根管网卡了变电站？刘总，把坐标和跨越方案报给我。王主任，你明天联系市水务局，约领导，我亲自去谈！不能因为一个管网把全区数字经济掐死！'}
+];
+
+var PARAS=[
+  {id:'p0',txt:'2026年3月21日，区委办公室主任王思在区政府1号会议室主持召开滨江智算产业园重大项目推进专题会议。区委副书记、区长陈凯出席会议，城投集团、沿江街道、区财政局、区规自局等11个单位主要负责人参会。',srcs:['s0']},
+  {id:'p1',txt:'（一）土地问题\n\n产业园二期地块清表工作滞后，剩余个别户因历史遗留问题及不合理诉求，影响交地进度。人才公寓用地规划性质调整（商业用地调为R2居住用地）需报市规自局审批，因需补充交通影响评价报告及教育配套承诺函而暂未获批。产业园二期建设存在土地指标缺口。',srcs:['s1','s2','s5']},
+  {id:'p2',txt:'（二）资金问题\n\n城投集团反映，项目账上资金仅可维持约半个月，二期土建存在约2亿元资金缺口，面临停工风险。区财政局表示当前收支压力大，直接拨付大额资金存在困难，建议通过专项债或项目融资方式解决。',srcs:['s7','s8','s9']},
+  {id:'p3',txt:'（三）电力与能耗问题\n\n配套220千伏变电站因选址路径涉及市水务局主管网，跨越施工协调未果，影响项目开工。拟入驻的头部算力企业要求确保双路市电供应及独立的能耗指标。区生态环境局指出，大算力中心能耗高，可能触及区域碳排放考核红线，需企业承诺购买30%以上绿电，方可推进环评。',srcs:['s10','s11','s14']},
+  {id:'p4',txt:'（四）工程建设与产业导入问题\n\n产业园一期建筑底板原设计荷载标准可能无法满足高端液冷机房要求，若加固将涉及设计变更、预算增加约2000万元及工期延长。数据局反映，电力与能耗指标是当前招商引资的核心制约因素，头部企业签约意向待条件明确。',srcs:['s12','s13']}
+];
+
+var DECS=[
+  {id:'d1',txt:'依法依规完成产业园二期地块全部清表，确保土地按时交付城投集团',p:'吴林',dept:'沿江街道',dl:'下月15日前',dlv:'清表完成交地',pri:'u',srcs:['s3','s4']},
+  {id:'d2',txt:'派专人驻点市规自局，全力协调人才公寓用地规划调整审批；本周内完成交通影响评价报告并协调出具教育配套承诺函；两周内明确产业园二期土地指标解决方案',p:'赵思睿',dept:'区规自局',dl:'本周/两周内',dlv:'调规获批+指标方案',pri:'u',srcs:['s5','s6']},
+  {id:'d3',txt:'研究通过盘活科教文卫结余资金、产业引导基金等渠道筹措资金的可行方案（财政），同步研究以项目收益权抵押等市场化融资方案（城投），下周二一并汇报，确保二期资金下月底前到位',p:'钱学培·郑瑞林',dept:'区财政局·城投集团',dl:'下周二方案/下月底到位',dlv:'资金调度方案+融资方案',pri:'u',srcs:['s7','s8','s9']},
+  {id:'d4',txt:'立即对接市水务局，协调解决变电站选址路径与主管网跨越问题，下周一前向区供电公司给出明确答复；区长将亲自参与协调',p:'王思（牵头）',dept:'区委办',dl:'下周一前',dlv:'协调结果答复',pri:'u',srcs:['s14','s15']},
+  {id:'d5',txt:'三部门下周内组织联合会审，明确环评通过路径（绿电承诺不低于30%）、建筑加固设计方案及产业落地条件；加固设计走绿色通道两周内完成；力争月底前与意向企业签订入驻意向协议',p:'周学琦·孙淼·冯斌',dept:'生态环境局·住建委·数据局',dl:'下周联合会审/月底协议',dlv:'联合会审结论+意向协议',pri:'i',srcs:['s10','s11','s12','s13']}
+];
+
+var DEFER=[
+  {txt:'城投集团建议先在一期搞一般机房，二期再上高端液冷，"先解决有没有的问题"',reason:'被区长明确否决，但城投融资能力约束真实存在，后续建设标准与资金的矛盾有待进一步研究',src:'s12'},
+  {txt:'发改委李局长建议引入社会资本搞PPP或以商业配套用地做抵押融资',reason:'建议已提出，尚未形成决议，待城投和财政资金方案汇报后研究是否采纳',src:'s9'}
+];
+
+var LSTEPS=['正在清洗口语化表达...','正在生成会议纪要...','正在提取核心决议...','正在生成任务清单...','正在草拟催办通知...'];
+var LSTMS=[0,1100,2400,3700,4800];
+var PRI_L={'u':'紧急','i':'重要','n':'一般'};
+var PRI_C={'u':'dt-u','i':'dt-i','n':'dt-n'};
+
+function T(s){var t=document.getElementById('toast');t.textContent=s;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000);}
+function sw(n){[0,1,2].forEach(function(i){document.getElementById('t'+i).style.display=i===n?'block':'none';document.getElementById('fb'+i).classList.toggle('active',i===n);});}
+function selT(el){document.querySelectorAll('#mtypes .ro8').forEach(function(r){r.classList.remove('sel')});el.classList.add('sel');}
+function eh(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+
+function addAg(data){
+  agIdx++;var idx=agIdx;
+  var w=document.getElementById('ag-list');var d=document.createElement('div');
+  d.className='ag-row';d.id='ag-'+idx;
+  var m=data?data.m:'';var s=data?(data.s||[]).join('\n'):'';
+  d.innerHTML='<div class="ag-num">'+idx+'</div><div class="ag-fields"><input placeholder="议题主标题" value="'+eh(m).replace(/<br>/g,'\n')+'"><textarea rows="3" placeholder="子议题（每行一条）">'+s+'</textarea></div><button class="ag-del" onclick="this.closest(\'.ag-row\').remove()">&#10005;</button>';
+  w.appendChild(d);
+}
+
+function getAg(){
+  var r=[];
+  document.querySelectorAll('.ag-row').forEach(function(row){
+    var i=row.querySelectorAll('input,textarea');
+    r.push({m:i[0].value,s:i[1].value.split('\n').filter(function(x){return x.trim();})});
+  });
+  return r;
+}
+
+function loadDemo(){
+  document.getElementById('n-title').value=DEMO.nTitle;
+  document.getElementById('n-org').value=DEMO.nOrg;
+  document.getElementById('n-date').value=DEMO.nDate;
+  document.getElementById('n-time').value=DEMO.nTime;
+  document.getElementById('n-loc').value=DEMO.nLoc;
+  document.getElementById('n-tmt').value=DEMO.nTmt;
+  document.getElementById('n-host').value=DEMO.nHost;
+  document.getElementById('n-contact').value=DEMO.nContact;
+  document.getElementById('n-units').value=DEMO.nUnits;
+  document.getElementById('n-req').value=DEMO.nReq;
+  document.getElementById('ag-list').innerHTML='';agIdx=0;
+  DEMO.nAg.forEach(function(a){addAg(a);});
+  document.getElementById('m-time').value=DEMO.mTime;
+  document.getElementById('m-loc').value=DEMO.mLoc;
+  document.getElementById('m-host').value=DEMO.mHost;
+  document.getElementById('m-rec').value=DEMO.mRec;
+  document.getElementById('m-att').value=DEMO.mAtt;
+  document.getElementById('m-raw').value=DEMO.mRaw;
+  document.querySelectorAll('#mtypes .ro8').forEach(function(r,i){r.classList.toggle('sel',i===1);});
+  T('演示数据已加载，点击各步骤按钮查看效果');
+}
+
+function genNotice(){
+  var title=document.getElementById('n-title').value;
+  if(!title){T('请填写会议主题');return;}
+  var org=document.getElementById('n-org').value||'（发文单位）';
+  var date=document.getElementById('n-date').value||'';
+  var time=document.getElementById('n-time').value||'待定';
+  var loc=document.getElementById('n-loc').value||'';
+  var tmt=document.getElementById('n-tmt').value||'';
+  var host=document.getElementById('n-host').value||'待定';
+  var contact=document.getElementById('n-contact').value||'';
+  var units=document.getElementById('n-units').value||'';
+  var req=document.getElementById('n-req').value||'';
+  var ags=getAg();
+  var locLine=loc?'<div class="np-field"><span class="np-fk">会议地点：</span><span>'+eh(loc)+'</span></div>':'';
+  var tmtLine=tmt?'<div class="np-field"><span class="np-fk">腾讯会议：</span><span>'+eh(tmt)+'</span></div>':'';
+  var agH=ags.filter(function(a){return a.m;}).map(function(a){
+    return '<div class="np-topic"><div class="np-topic-main">'+eh(a.m)+'</div>'+(a.s.length?'<div class="np-topic-subs">'+a.s.map(eh).join('<br>')+'</div>':'')+'</div>';
+  }).join('');
+  var unitsH=units?'<div class="np-field" style="margin-top:6px"><span class="np-fk" style="min-width:80px">参会单位：</span><span>'+eh(units)+'</span></div>':'';
+  var reqH=req?'<div class="np-field" style="margin-top:6px"><span class="np-fk" style="min-width:80px">会议要求：</span><span>'+eh(req)+'</span></div>':'';
+  document.getElementById('n-preview').innerHTML=
+    '<div class="np-head"><div class="np-org">'+eh(org)+'</div><div class="np-line"></div></div>'+
+    '<div class="np-title">会议通知</div>'+
+    '<div class="np-body"><div class="np-field"><span class="np-fk">会议时间：</span><span>'+eh(time)+'</span></div>'+
+    locLine+tmtLine+'<div class="np-field"><span class="np-fk">主持人：</span><span>'+eh(host)+'</span></div>'+
+    '<div style="margin-top:8px;font-weight:500">会议议题：</div><div style="margin-top:4px">'+agH+'</div>'+
+    unitsH+reqH+'</div>'+
+    '<div class="np-footer">'+eh(org)+'<br>'+eh(date)+'</div>'+
+    (contact?'<div class="np-contact">（联系人：'+eh(contact)+'）</div>':'');
+  document.getElementById('n-out').style.display='block';
+  document.getElementById('fb0').classList.add('done');
+}
+
+function hideMin(){document.getElementById('m-out').style.display='none';document.getElementById('m-result').style.display='none';document.getElementById('m-loading').style.display='none';}
+
+function genMin(){
+  var raw=document.getElementById('m-raw').value;
+  if(!raw){T('请粘贴会议记录原文');return;}
+  var btn=document.getElementById('btn-m');btn.disabled=true;
+  document.getElementById('m-out').style.display='block';
+  document.getElementById('m-loading').style.display='flex';
+  document.getElementById('m-result').style.display='none';
+  var sl=document.getElementById('m-lsteps');
+  sl.innerHTML=LSTEPS.map(function(s,i){return '<div class="lstep" id="ls'+i+'"><div class="lstep-dot"></div>'+s+'</div>';}).join('');
+  LSTEPS.forEach(function(s,i){
+    setTimeout(function(){
+      document.querySelectorAll('.lstep').forEach(function(e,j){e.classList.remove('a','d');if(j<i)e.classList.add('d');else if(j===i)e.classList.add('a');});
+      document.getElementById('m-ltxt').textContent=s;
+    },LSTMS[i]);
+  });
+  setTimeout(function(){
+    btn.disabled=false;
+    document.getElementById('m-loading').style.display='none';
+    document.getElementById('m-result').style.display='block';
+    buildMinOut();buildTaskTab();
+    document.getElementById('fb1').classList.add('done');
+  },6200);
+}
+
+function buildSrc(){
+  return SRCS.map(function(s){
+    return '<div class="src-span" id="'+s.id+'">'+(s.spk?'<span class="src-person">'+eh(s.spk)+'：</span>':'')+eh(s.txt)+'</div><span class="src-sep"></span>';
+  }).join('');
+}
+
+function buildMinOut(){
+  document.getElementById('src-content').innerHTML=buildSrc();
+  var h='';
+  h+='<div class="min-sec-head">一、会议基本情况</div>';
+  PARAS.forEach(function(p){h+='<div class="tp" data-s="'+p.srcs.join(',')+'" onclick="trP(this)">'+eh(p.txt)+'</div>';});
+  h+='<div class="min-sec-head">二、议定事项</div>';
+  DECS.forEach(function(d){
+    h+='<div class="dec-item" data-s="'+d.srcs.join(',')+'" onclick="trP(this)">'+
+      '<div class="dec-num">'+d.id.replace('d','')+'</div>'+
+      '<div class="dec-content">'+eh(d.txt)+
+      '<div class="dec-meta"><span class="dec-tag dt-p">'+eh(d.p)+'（'+eh(d.dept)+'）</span>'+
+      '<span class="dec-tag dt-dl">&#128197; '+eh(d.dl)+'</span>'+
+      '<span class="dec-tag '+PRI_C[d.pri]+'">'+PRI_L[d.pri]+'</span></div></div></div>';
+  });
+  h+='<div class="defer-zone"><div class="defer-head">&#9889; 暂缓与分歧追踪 <span style="font-size:10px;font-weight:400;margin-left:4px">（未达成共识，需跟进）</span></div>';
+  DEFER.forEach(function(d){
+    h+='<div class="defer-item" onclick="trSrc([\''+d.src+'\'])"><div class="defer-ico">&#9940;</div><div><div>'+eh(d.txt)+'</div><div class="defer-reason">'+eh(d.reason)+'</div></div></div>';
+  });
+  h+='</div>';
+  document.getElementById('m-left').innerHTML=h;
+}
+
+function trP(el){
+  document.querySelectorAll('.tp,.dec-item').forEach(function(e){e.classList.remove('traced')});
+  el.classList.add('traced');
+  trSrc((el.getAttribute('data-s')||'').split(',').filter(Boolean));
+}
+function trSrc(ids){
+  document.getElementById('src-idle').style.display='none';
+  document.getElementById('src-content').style.display='block';
+  document.querySelectorAll('.src-span').forEach(function(s){s.classList.remove('hl')});
+  var first=null;
+  ids.forEach(function(id){var el=document.getElementById(id);if(el){el.classList.add('hl');if(!first)first=el;}});
+  if(first)first.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function buildTaskTab(){
+  document.getElementById('t2-tip').style.display='none';
+  document.getElementById('t2-main').style.display='block';
+  var bp={};
+  DECS.forEach(function(d){if(!bp[d.p])bp[d.p]=[];bp[d.p].push(d);});
+  var INI={'吴林':'吴','赵思睿':'赵','钱学培·郑瑞林':'钱','王思（牵头）':'王','周学琦·孙淼·冯斌':'周'};
+  var h='';
+  Object.keys(bp).forEach(function(p){
+    var tasks=bp[p];
+    h+='<div class="person-card"><div class="pc-head"><div class="pc-name"><div class="pc-av">'+(INI[p]||p.charAt(0))+'</div>'+eh(p)+'（'+eh(tasks[0].dept)+'）</div><span class="pc-cnt">'+tasks.length+'项</span></div><div class="task-list">';
+    tasks.forEach(function(t){
+      h+='<div class="task-item"><div class="task-dot"></div><div><div class="task-text">'+eh(t.txt)+'</div><div class="task-meta"><span class="task-dl">&#128197; '+eh(t.dl)+'</span><span class="task-dlv">'+eh(t.dlv)+'</span><span class="dec-tag '+PRI_C[t.pri]+'">'+PRI_L[t.pri]+'</span></div></div></div>';
+    });
+    h+='</div></div>';
+  });
+  document.getElementById('t-cards').innerHTML=h;
+}
+
+function genAlerts(){
+  setTimeout(function(){
+    var N=[
+      {to:'吴林',txt:'吴书记，您好！根据2026年3月21日滨江智算产业园重大项目推进专题会议安排，请您亲自负责：依法依规完成产业园二期地块全部清表工作，下月15日前确保土地按时交付城投集团。公安部门将依法配合保障施工环境。如遇重大阻力，请及时向区委办反映，陈区长将亲自协调。感谢配合！'},
+      {to:'赵思睿',txt:'赵局长，您好！根据2026年3月21日会议安排，请您：①本周内派专人驻点市规自局协调人才公寓调规审批，完成交通影响评价报告并协调教育配套承诺函；②两周内明确产业园二期土地指标解决方案。人才公寓交通评价报告本周必须出！感谢配合！'},
+      {to:'钱学培·郑瑞林',txt:'钱局长、郑总，您们好！根据2026年3月21日会议安排，请两位：①区财政局研究通过盘活科教文卫结余资金、产业引导基金等渠道筹措资金的可行方案；②城投集团研究以项目收益权抵押等市场化融资方案。双方方案于下周二一并向陈区长汇报，确保二期资金下月底前到位，绝不允许停工！感谢配合！'},
+      {to:'王思',txt:'王主任，您好！根据2026年3月21日会议安排，请您明天即联系市水务局，约定领导会面，协调解决变电站选址路径与主管网跨越问题。陈区长将亲自参与协调。务必于下周一前向区供电公司给出明确答复。'},
+      {to:'周学琦·孙淼·冯斌',txt:'周局长、孙主任、冯局长，您们好！根据2026年3月21日会议安排，三部门需于下周内组织联合会审，明确：环评通过路径（绿电承诺不低于30%）、一期建筑加固设计方案（走绿色通道两周内完成）、产业落地条件；约2000万元新增加固预算纳入城投融资方案；数据局力争月底前与意向企业签订入驻意向协议。感谢配合！'}
+    ];
+    document.getElementById('ca-notices').innerHTML=N.map(function(n){
+      return '<div class="notice-block"><div class="nb-to">致：'+eh(n.to)+'</div><div class="nb-text">'+eh(n.txt).replace(/\n/g,'<br>')+'</div></div>';
+    }).join('');
+    document.getElementById('ca-out').style.display='block';
+    document.getElementById('fb2').classList.add('done');
+  },1100);
+}
+
+function cpEl(id){navigator.clipboard.writeText(document.getElementById(id).innerText).then(function(){T('已复制到剪贴板');});}
+function escDoc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function dlDoc(html,fn){
+  var full='<!DOCTYPE html><html><head><meta charset="utf-8"><style>'
+    +'@page{size:A4; margin:30mm 26mm 22mm 28mm;}'
+    +'body{font-family:"SimSun","宋体",serif;line-height:1.95;font-size:16pt;color:#000;margin:0;}'
+    +'.doc{padding:0;}'
+    +'.title{text-align:center;font-size:22pt;font-weight:700;line-height:1.5;margin:8px 0 6px;}'
+    +'.p{margin:0 0 4px 0;text-indent:2em;line-height:1.95;text-align:justify;}'
+    +'.rh-top{text-align:center;color:#D10000;font-size:30pt;font-weight:700;letter-spacing:1px;line-height:1.22;margin:40px 0 10px;}'
+    +'.rh-sub{text-align:center;color:#111;font-size:18pt;margin:0 0 26px;line-height:1.4;}'
+    +'.rh-orgdate{text-align:left;font-size:14pt;color:#222;line-height:1.7;margin:0 0 4px;}'
+    +'.rh-line{border-top:3px solid #D10000;height:0;margin:2px 0 26px;}'
+    +'.rh-sec{margin:14px 0 8px;font-weight:700;font-size:16pt;line-height:1.8;}'
+    +'.rh-item{margin:2px 0 4px;text-indent:2em;line-height:1.95;text-align:justify;}'
+    +'.rh-resp{margin:2px 0 8px;text-indent:2em;font-size:15pt;line-height:1.9;}'
+    +'.page-num{text-align:center;font-size:12pt;line-height:1.5;margin:16px 0 10px;}'
+    +'.page-break{page-break-before:always;}'
+    +'.rh-foot{margin-top:12px;font-size:14pt;line-height:1.95;}'
+    +'.rh-footline{border-top:1px solid #555;margin-top:10px;padding-top:8px;line-height:1.9;}'
+    +'.rh-printline{border-top:1px solid #777;margin-top:28px;padding-top:6px;text-align:right;}'
+    +'</style></head><body><div class="doc">'+html+'</div></body></html>';
+  var blob=new Blob(['\uFEFF'+full],{type:'application/msword'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=fn+'.doc';a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);},1200);
+}
+function dlXls(tableHtml,fn){
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><style>'
+    +'table{border-collapse:collapse;font-family:"Microsoft YaHei","SimSun",sans-serif;font-size:12pt;}'
+    +'th,td{border:1px solid #333;padding:6px 8px;vertical-align:top;}'
+    +'th{background:#E8EFF7;font-weight:700;}'
+    +'</style></head><body>'+tableHtml+'</body></html>';
+  var blob=new Blob(['\uFEFF'+html],{type:'application/vnd.ms-excel'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=fn+'.xls';a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);},1200);
+}
+function expWord(id,name){
+  var org=document.getElementById('n-org').value||'滨江区区委办公室';
+  var date=document.getElementById('n-date').value||'2026年3月18日';
+  var body=document.getElementById(id).innerText||'';
+  var html='<div class="title">'+escDoc(name)+'</div><div class="p">'+escDoc(body)+'</div><div class="sign">'+escDoc(org)+'<br>'+escDoc(date)+'</div>';
+  dlDoc(html,name);
+  T('Word（.doc）已导出');
+}
+
+function expMinWord(){
+  var issueDate='2026年3月22日';
+  var issueNo='2026年第2期';
+  var org='滨江区区委办公室';
+  var meetingTitle='滨江智算产业园重大项目推进专题会议';
+  var attendees=(document.getElementById('m-att').value||'陈凯、王思、郑瑞林、吴林、赵思睿、钱学培、周学琦、孙淼、冯斌、李永亮、刘莘').replace(/等共?\d+人/g,'');
+  var html=''
+    +'<div class="rh-top">'+escDoc(org)+'会议纪要</div>'
+    +'<div class="rh-sub">'+escDoc(issueNo)+'</div>'
+    +'<div class="rh-orgdate">'+escDoc(org)+escDoc(issueDate)+'</div>'
+    +'<div class="rh-line"></div>'
+    +'<div class="title">'+escDoc(meetingTitle)+'</div>'
+    +'<div class="title" style="font-size:20pt;margin-top:0;margin-bottom:20px">会议纪要</div>';
+  PARAS.forEach(function(p){html+='<div class="p">'+escDoc(p.txt)+'</div>';});
+  html+='<div class="rh-sec">二、会议议定事项</div>';
+  DECS.forEach(function(d,i){
+    html+='<div class="rh-item">'+(i+1)+'．'+escDoc(d.txt)+'</div>'
+      +'<div class="rh-resp">责任人：'+escDoc(d.p)+'（'+escDoc(d.dept)+'）</div>'
+      +'<div class="rh-resp">时限：'+escDoc(d.dl)+'</div>';
+  });
+  html+='<div class="rh-foot">'
+    +'<div class="page-num">-1-</div>'
+    +'<div class="page-break"></div>'
+    +'<div class="p">会议要求，各相关单位务必高度重视，将本项目作为政治任务来抓，主动担当，加强协作，严格按照上述时间节点和责任分工狠抓落实。区委办公室将对议定事项建立督办台账，定期通报进展，对推进不力的单位和个人将严肃问责。</div>'
+    +'<div class="p" style="margin-top:14px">出席：'+escDoc(attendees)+'</div>'
+    +'<div class="page-num">-2-</div>'
+    +'<div class="rh-footline">报：赵远航、陈凯同志<br>送：区发改委、区财政局、区住建委、区规自局、区生态环境局、区数据局、沿江街道党工委、区城投集团、区供电公司</div>'
+    +'<div class="rh-printline">'+escDoc(org)+escDoc(issueDate)+'印发</div>'
+    +'<div class="page-num">-3-</div>'
+    +'</div>';
+  dlDoc(html,'会议纪要');
+  T('会议纪要Word已按红头公文版导出');
+}
+
+function expDecExcel(){
+  var h='<table><thead><tr><th>序号</th><th>议定事项</th><th>责任人</th><th>责任部门</th><th>时限</th><th>交付成果</th><th>优先级</th></tr></thead><tbody>';
+  DECS.forEach(function(d){
+    h+='<tr><td>'+escDoc(d.id.replace('d',''))+'</td><td>'+escDoc(d.txt)+'</td><td>'+escDoc(d.p)+'</td><td>'+escDoc(d.dept)+'</td><td>'+escDoc(d.dl)+'</td><td>'+escDoc(d.dlv)+'</td><td>'+escDoc(PRI_L[d.pri])+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  dlXls(h,'议定事项');
+  T('议定事项Excel（.xls）已导出');
+}
+function expTaskExcel(){expDecExcel();T('任务清单Excel（.xls）已导出');}
+
+sw(0);
+</script>
+</body>
+</html>
